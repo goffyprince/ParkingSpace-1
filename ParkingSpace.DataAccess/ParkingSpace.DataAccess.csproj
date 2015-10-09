@@ -49,6 +49,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Core\FakeRepositoty_T.cs" />
+    <Compile Include="Core\IRepository.cs" />
+    <Compile Include="Core\IRepository_T.cs" />
+    <Compile Include="Core\RepositoryBase_T.cs" />
+    <Compile Include="ParkingSpaceDb.cs" />
     <Compile Include="ParkingTicketRepository.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -64,7 +69,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Context\" />
-    <Folder Include="Core\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

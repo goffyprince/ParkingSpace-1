@@ -8,14 +8,12 @@ namespace ParkingSpace.Web.Printing
     public class PdfParkingTicketPrinter : IParkingTicketPrinter
     {
 
-        private ControllerContext context;
-
-        public PdfParkingTicketPrinter(ControllerContext context)
+        public PdfParkingTicketPrinter()
         {
-            this.context = context;
+            //
         }
 
-        void IParkingTicketPrinter.Print(ParkingTicket ticket)
+        public void Print(ParkingTicket ticket, object args = null)
         {
             var r = new ViewAsPdf("RPT-01-ParkingTicket-In", ticket);
 
@@ -25,7 +23,7 @@ namespace ParkingSpace.Web.Printing
             var fileName = ticket.Id + ".pdf";
             var filePath = HttpContext.Current.Server.MapPath("~/App_Data/" + fileName);
 
-            var bytes = r.BuildPdf(context);
+            var bytes = r.BuildPdf((ControllerContext)args);
             System.IO.File.WriteAllBytes(filePath, bytes);
         }
     }

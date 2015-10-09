@@ -2,6 +2,7 @@
 using ParkingSpace.Services;
 using ParkingSpace.Services.Core;
 using System;
+using System.Linq;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -14,7 +15,6 @@ namespace ParkingSpace.Facts.Services {
       public void HasDefaultValues() {
         var s = new ParkingTicketService();
         Assert.Equal(0, s.GateId);
-        Assert.Equal(1, s.NextId);
       }
 
     }
@@ -50,29 +50,30 @@ namespace ParkingSpace.Facts.Services {
         Assert.Null(t.DateOut);
       }
 
-      [Fact]
-      public void NewTicket_HasAutoRunningId() {
-        var s = new ParkingTicketService();
+            [Fact]
+            public void NewTicket_HasAutoRunningId()
+            {
+                using (var app = new App(testing: true))
+                {
+                    var s = app.ParkingTickets;
 
-        int nextId1 = s.NextId;
-        var ticket1 = s.CreateParkingTicket("23");
-        var ticketId1 = string.Format("00-{0:00000}", nextId1);
+                    var ticket1 = s.CreateParkingTicket("23");
+                    var ticketId1 = string.Format("00-{0:00000}", 1);
 
-        displayTicket(ticket1);
+                    displayTicket(ticket1);
 
-        Assert.Equal(ticketId1, ticket1.Id);
+                    Assert.Equal(ticketId1, ticket1.Id);
 
-        int nextId2 = s.NextId;
-        var ticket2 = s.CreateParkingTicket("555");
-        var ticketId2 = string.Format("00-{0:00000}", nextId2);
+                    var ticket2 = s.CreateParkingTicket("555");
+                    var ticketId2 = string.Format("00-{0:00000}", 2);
 
-        displayTicket(ticket2);
+                    displayTicket(ticket2);
 
-        Assert.Equal(nextId1 + 1, nextId2);
-        Assert.Equal(ticketId2, ticket2.Id);
-      }
-       
-      [Fact]
+                    Assert.Equal(ticketId2, ticket2.Id);
+                }
+            }
+
+            [Fact]
       public void NewTicket_UsesGateIdFromService() {
         var s = new ParkingTicketService();
          
@@ -88,7 +89,23 @@ namespace ParkingSpace.Facts.Services {
         output.WriteLine($"  Plate:   {t.PlateNumber}");
         output.WriteLine($"  Date In: {t.DateIn:s}"); 
       }
-    }
+
+            [Fact]
+            public void NewTicket_HasInsertedToDatabase()
+            {
+                using (var app = new App(testing: true))
+                {
+
+                    var t = app.ParkingTickets.CreateParkingTicket("112233");
+
+                    var count = app.ParkingTickets.All().Count();
+                    Assert.Equal(1, count);
+
+                    var firstTicket = app.ParkingTickets.All().FirstOrDefault();
+                    Assert.Equal("112233", firstTicket.PlateNumber);
+                }
+            }
+        }
 
   }
 }

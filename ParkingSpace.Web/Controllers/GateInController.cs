@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Web;
+﻿// GateInController
 using System.Web.Mvc;
 using ParkingSpace.Models;
 using ParkingSpace.Services;
@@ -15,27 +13,19 @@ namespace ParkingSpace.Web.Controllers
     public class GateInController : Controller
     {
 
-        #region static members
-
-        private static ParkingTicketService service;
-
-        static GateInController()
-        {
-            service = new ParkingTicketService();
-        }
-
-        #endregion
-
+        private App app;
         private IParkingTicketPrinter printer;
 
         public GateInController()
         {
-            printer = new PdfParkingTicketPrinter(this.ControllerContext);
+            printer = new PdfParkingTicketPrinter();
+            app = new App();
         }
 
-        public GateInController(IParkingTicketPrinter printer)
+        public GateInController(IParkingTicketPrinter printer, App app)
         {
             this.printer = printer;
+            this.app = app;
         }
 
         [Route]
@@ -48,11 +38,9 @@ namespace ParkingSpace.Web.Controllers
         [Route("CreateTicket")]
         public ActionResult CreateTicket(string plateNo)
         {
-            var ticket = service.CreateParkingTicket(plateNo);
-            printer = new PdfParkingTicketPrinter(this.ControllerContext);
+            var ticket = app.ParkingTickets.CreateParkingTicket(plateNo);
 
-            printer.Print(ticket);
-
+            printer.Print(ticket, this.ControllerContext);
 
             TempData["newTicket"] = ticket;
             return RedirectToAction("Index");
